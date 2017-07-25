@@ -7,3 +7,42 @@ GET     /                           controllers.Application.index
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# task one, a redirect
+GET     /google                     controllers.Default.redirect(to = "http://www.google.com")
+
+# task two.. dynamic n.b. this is not a query parameter but a path
+GET     /hello/:name                controllers.Application.hello(name: String)
+
+# task two, static
+GET     /a-static-thing             controllers.Application.somethingStatic
+
+# task two, default
+GET     /images                     controllers.Application.images(query: String ?= "kittens")
+
+# task two, set? is this something where the headers are overriden??
+GET     /something-set              controllers.Application.hello(name = "Tadas")
+
+# task two, optional e.g. http://localhost:9000/with-option?opt=matt
+GET     /with-option                controllers.Application.optional(opt: Option[String])
+
+# reverse routing
+GET     /lose-house                 controllers.Application.loseHouse
+
+# another Default action
+GET     /default                    controllers.Default.todo
+
+# unreachable
+GET     /default                    controllers.Default.notFound
+
+# session cookie
+GET     /sess-cookie                controllers.Application.sessCookie(cooked: Option[String])
+
+# flash scope
+GET     /flashy                     controllers.Application.flashy
+GET     /flashed                    controllers.Application.flashed
+
+# session scope
+GET     /session                    controllers.Application.sessionName
+
+
