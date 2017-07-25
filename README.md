@@ -1,1 +1,1 @@
-# helloWorld training
+# helloWorld - QA play training
