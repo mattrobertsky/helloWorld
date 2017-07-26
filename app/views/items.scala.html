@@ -1,0 +1,33 @@
+@(items: Seq[Item], form: Form[ItemData])(implicit messages: Messages)
+
+@display(item: Item) = {
+    @item.name <br/>
+    <img src="data:image/png;base64, @item.picture">
+}
+
+
+@main("Items") {
+
+    <h1>@if(items.isEmpty) { No items } else { Items }</h1>
+    <ul>
+        @for(item <- items) {
+            <li>@display(item)</li>
+        }
+    </ul>
+
+    <hr/>
+
+    @helper.form(action = routes.ItemManagementController.createItem(), 'enctype -> "multipart/form-data") {
+        @helper.inputText(form("name"))
+        @helper.inputText(form("description"))
+        @helper.inputText(form("manufacturer"))
+        @helper.inputText(form("warranty"))
+        @helper.inputText(form("price"))
+        @helper.inputText(form("discount.howManyItems"))
+        @helper.inputText(form("discount.percentageOff"))
+        @helper.inputText(form("seller"))
+        @helper.inputFile(form("picture"))
+        <button type="submit">create item</button>
+
+    }
+}

@@ -45,4 +45,12 @@ GET     /flashed                    controllers.Application.flashed
 # session scope
 GET     /session                    controllers.Application.sessionName
 
+# bootstrap contact form
+GET     /contact-us                 controllers.Application.contactForm
+
+# ITEMS PROCJECT ROUTES
+GET     /items                      controllers.ItemManagementController.listItems
+POST    /create-item                controllers.ItemManagementController.createItem
+
+
 

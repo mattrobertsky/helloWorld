@@ -1,6 +1,5 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 
 class Application extends Controller {
@@ -61,6 +60,11 @@ class Application extends Controller {
       Unauthorized("you are not on the session, please say hello!")
     )
   }
+
+  def contactForm: Action[AnyContent] = Action {
+    Ok(views.html.bscontactform())
+  }
+
 }
 
 
