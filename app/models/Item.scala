@@ -4,7 +4,6 @@ import play.api.data.Form
 import play.api.data.Forms._
 
 import scala.collection.mutable.ArrayBuffer
-import scala.reflect.io.File
 
 case class Item(name: String,
                 description: String,
@@ -13,10 +12,11 @@ case class Item(name: String,
                 price: BigDecimal,
                 discount: Discount,
                 seller: String,
-                var picture: Array[Byte]
+                picture: String
                )
 
-case class ItemData(name: String,
+case class ItemData(index: Option[Int],
+                    name: String,
                     description: String,
                     manufacturer: String,
                     warranty: Int,
@@ -30,6 +30,7 @@ object ItemData {
 
   val createItemForm: Form[ItemData] = Form(
     mapping(
+      "index" -> optional(number),
       "name" -> nonEmptyText,
       "description" -> nonEmptyText,
       "manufacturer" -> nonEmptyText,
@@ -43,12 +44,6 @@ object ItemData {
     )(ItemData.apply)(ItemData.unapply)
   )
 
-  val items: ArrayBuffer[Item] = ArrayBuffer[Item](
-//    Item("foo1", "bar", "foobar", 10, 99.00, Discount(2, 50), "jo", "somefilepath"),
-//    Item("foo2", "bar", "foobar", 10, 99.00, Discount(2, 50), "jo", "somefilepath"),
-//    Item("foo3", "bar", "foobar", 10, 99.00, Discount(2, 50), "jo", "somefilepath"),
-//    Item("foo4", "bar", "foobar", 10, 99.00, Discount(2, 50), "jo", "somefilepath")
-//    Item("foo4", "bar", "foobar", 10, 99.00, Discount(2, 50), "jo")
-  )
+  val items: ArrayBuffer[Item] = ArrayBuffer[Item]()
 
 }

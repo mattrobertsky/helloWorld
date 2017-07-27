@@ -1,8 +1,9 @@
-@(items: Seq[Item], form: Form[ItemData])(implicit messages: Messages)
+@(items: Seq[Item], form: Form[ItemData])(implicit messages: Messages, flash: Flash)
 
-@display(item: Item) = {
+@display(item: Item, index: Int) = {
     @item.name <br/>
-    <img src="data:image/png;base64, @item.picture">
+    <img style="width: 20vw" src="@item.picture")><br/>
+    <a href="@routes.ItemManagementController.editItem(index)">edit</a>
 }
 
 
@@ -10,14 +11,16 @@
 
     <h1>@if(items.isEmpty) { No items } else { Items }</h1>
     <ul>
-        @for(item <- items) {
-            <li>@display(item)</li>
+        @for((item, index) <- items.zipWithIndex) {
+            <li>@display(item, index)</li>
         }
     </ul>
 
     <hr/>
 
     @helper.form(action = routes.ItemManagementController.createItem(), 'enctype -> "multipart/form-data") {
+        <input type="hidden" name="index" value="0"/>
+
         @helper.inputText(form("name"))
         @helper.inputText(form("description"))
         @helper.inputText(form("manufacturer"))

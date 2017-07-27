@@ -2,36 +2,43 @@ package controllers
 
 import javax.inject.Inject
 
-import models.{Discount, Item, ItemData}
+import models.{Item, ItemData}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.Files
-import com.google.common.io.Files._
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc._
 
-class ItemManagementController @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport{
+class ItemManagementController @Inject()(val messagesApi: MessagesApi, environment: play.api.Environment) extends Controller with I18nSupport {
 
   def listItems: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.items(ItemData.items, ItemData.createItemForm))
   }
 
+  def editItem(index: Int):  Action[AnyContent] = Action { implicit request =>
+    val item = ItemData.items(index)
+    val itemData = ItemData(Some(index), item.name, item.description, item.manufacturer, item.warranty, item.price, item.discount, item.seller)
+    Ok(views.html.items(ItemData.items, ItemData.createItemForm.fill(itemData)))
+  }
 
-
-//  def createItem: Action[AnyContent] = Action { implicit request =>
   def createItem: Action[MultipartFormData[Files.TemporaryFile]] = Action(parse.multipartFormData) { implicit request =>
     val boundForm = ItemData.createItemForm.bindFromRequest
     boundForm.fold({ formWithErrors =>
-      formWithErrors.errors.seq.foreach(x => println(x.message))
+      formWithErrors.errors.foreach(x => println(x))
+
       BadRequest(views.html.items(ItemData.items, formWithErrors))
     }, { itemData =>
 
-
       request.body.file("picture").map { picture =>
+        import java.io.File
+        val filename = picture.filename.replaceAll(" ", "_")
+//        val contentType = picture.contentType
+        val p = environment.rootPath.getAbsolutePath
+        val path = s"$p/public/images/$filename"
+
+        picture.ref.moveTo(new File(path))
         val item = Item(itemData.name, itemData.description, itemData.manufacturer,
           itemData.warranty, itemData.price, itemData.discount, itemData.seller,
-          toByteArray(picture.ref.file))
+          routes.Assets.at(s"images/$filename").url)
         ItemData.items.append(item)
-
 
       }.getOrElse {
         Redirect(routes.Application.index).flashing(
@@ -39,13 +46,9 @@ class ItemManagementController @Inject()(val messagesApi: MessagesApi) extends C
       }
 
 
-
-
-
       Redirect(routes.ItemManagementController.listItems)
     })
   }
-
 
 
 }
