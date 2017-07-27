@@ -2,10 +2,15 @@
 
 @display(item: Item, index: Int) = {
     @item.name <br/>
-    <img style="width: 20vw" src="@item.picture")><br/>
+    @image(item)
     <a href="@routes.ItemManagementController.editItem(index)">edit</a>
 }
 
+@image(item: Item) = {
+    @if(item.picture.replaceFirst("/assets/images/","").nonEmpty) {
+        <img style="width: 20vw" src="@item.picture")><br/>
+    }
+}
 
 @main("Items") {
 
@@ -19,8 +24,7 @@
     <hr/>
 
     @helper.form(action = routes.ItemManagementController.createItem(), 'enctype -> "multipart/form-data") {
-        <input type="hidden" name="index" value="0"/>
-
+        <input type="hidden" name="index" value="@form.data.getOrElse("index", -1)"/>
         @helper.inputText(form("name"))
         @helper.inputText(form("description"))
         @helper.inputText(form("manufacturer"))
@@ -30,7 +34,8 @@
         @helper.inputText(form("discount.percentageOff"))
         @helper.inputText(form("seller"))
         @helper.inputFile(form("picture"))
-        <button type="submit">create item</button>
-
+        <button type="submit" name="action" value="save">save</button>
+        <button type="submit" name="action" value="delete">delete</button>
     }
+
 }
