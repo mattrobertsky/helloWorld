@@ -1,13 +1,13 @@
-@(items: Seq[Item], form: Form[ItemData])(implicit messages: Messages, flash: Flash)
+@(items: Seq[ItemData], form: Form[ItemData])(implicit messages: Messages, flash: Flash)
 
-@display(item: Item, index: Int) = {
+@display(item: ItemData, index: Int) = {
     @item.name <br/>
     @image(item)
     <a href="@routes.ItemManagementController.editItem(index)">edit</a>
 }
 
-@image(item: Item) = {
-    @if(item.picture.replaceFirst("/assets/images/","").nonEmpty) {
+@image(item: ItemData) = {
+    @if(item.picture.nonEmpty && item.picture.get.replaceFirst("/assets/images/","").nonEmpty) {
         <img style="width: 20vw" src="@item.picture")><br/>
     }
 }
@@ -24,7 +24,7 @@
     <hr/>
 
     @helper.form(action = routes.ItemManagementController.createItem(), 'enctype -> "multipart/form-data") {
-        <input type="hidden" name="index" value="@form.data.getOrElse("index", -1)"/>
+        <input type="hidden" name="index" value="@form.data.getOrElse("index", items.size)"/>
         @helper.inputText(form("name"))
         @helper.inputText(form("description"))
         @helper.inputText(form("manufacturer"))

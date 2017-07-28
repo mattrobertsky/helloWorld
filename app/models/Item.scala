@@ -2,18 +2,9 @@ package models
 
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.libs.json._
 
 import scala.collection.mutable.ArrayBuffer
-
-case class Item(name: String,
-                description: String,
-                manufacturer: String,
-                warranty: Int,
-                price: BigDecimal,
-                discount: Discount,
-                seller: String,
-                picture: String
-               )
 
 case class ItemData(index: Option[Int],
                     name: String,
@@ -22,11 +13,19 @@ case class ItemData(index: Option[Int],
                     warranty: Int,
                     price: BigDecimal,
                     discount: Discount,
-                    seller: String
+                    seller: String,
+                    var picture: Option[String]
                    )
 
-
 object ItemData {
+
+  import play.api.libs.json.Json
+
+
+  // Generates Writes and Reads for Feed and User thanks to Json
+  implicit val discountFormat = Json.format[Discount]
+  //  implicit val itemFormat = Json.format[ItemData]
+  implicit val itemDataFormat: OFormat[ItemData] = Json.format[ItemData]
 
   val createItemForm: Form[ItemData] = Form(
     mapping(
@@ -40,10 +39,11 @@ object ItemData {
         "howManyItems" -> number,
         "percentageOff" -> number
       )(Discount.apply)(Discount.unapply),
-      "seller" -> nonEmptyText
+      "seller" -> nonEmptyText,
+      "picture" -> optional(text)
     )(ItemData.apply)(ItemData.unapply)
   )
 
-  val items: ArrayBuffer[Item] = ArrayBuffer[Item]()
+  val items: ArrayBuffer[ItemData] = ArrayBuffer[ItemData]()
 
 }
