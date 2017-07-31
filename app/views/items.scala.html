@@ -3,7 +3,7 @@
 @display(item: ItemData, index: Int) = {
     @item.name <br/>
     @image(item)
-    <a href="@routes.ItemManagementController.editItem(index)">edit</a>
+    <a href="@routes.ItemManagementController.findByIndex(index)">edit</a>
 }
 
 @image(item: ItemData) = {

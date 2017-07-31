@@ -51,7 +51,8 @@ GET     /contact-us                 controllers.Application.contactForm
 # ITEMS PROCJECT ROUTES
 GET     /items                      controllers.ItemManagementController.listItems
 POST    /create-item                controllers.ItemManagementController.createItem
-GET     /load                       controllers.ItemManagementController.editItem(index: Int)
+#GET     /load                       controllers.ItemManagementController.editItem(index: Int)
+GET     /load                       controllers.ItemManagementController.findByIndex(index: Int)
 
 
 
