@@ -3,6 +3,10 @@ package models
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json._
+import reactivemongo.bson.BSONObjectID
+
+import play.modules.reactivemongo.json._
+import play.modules.reactivemongo.json.collection._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -23,8 +27,8 @@ object ItemData {
 
 
   // Generates Writes and Reads for Feed and User thanks to Json
-  implicit val discountFormat = Json.format[Discount]
-  //  implicit val itemFormat = Json.format[ItemData]
+  //implicit val discountFormat = Json.format[Discount]
+//  implicit val itemFormat = Json.format[ItemData]
   implicit val itemDataFormat: OFormat[ItemData] = Json.format[ItemData]
 
   val createItemForm: Form[ItemData] = Form(

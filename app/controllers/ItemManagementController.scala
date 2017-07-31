@@ -2,27 +2,57 @@ package controllers
 
 import javax.inject.Inject
 
-import models.ItemData
+import scala.concurrent.Future
+import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import models._
+import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
+import reactivemongo.play.json._
+import collection._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.Files
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.mvc._
-import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import reactivemongo.play.json.collection.JSONCollection
-import play.modules.reactivemongo.json._
-import play.modules.reactivemongo.json.collection._
 import reactivemongo.bson.BSONDocument
-
-import scala.concurrent.Future
 
 class ItemManagementController @Inject()(val messagesApi: MessagesApi, environment: play.api.Environment, val reactiveMongoApi: ReactiveMongoApi) extends Controller
   with I18nSupport with MongoController with ReactiveMongoComponents {
 
   def collection: Future[JSONCollection] = database.map(_.collection[JSONCollection]("items"))
-  var i = 0;
-  collection.foreach(_ => i = i +1)
+//  def collectionB: JSONCollection = db.collection[JSONCollection]("items")
+
+//  def findByName(name: String) = Action.async {
+//    // let's do our query
+//    val cursor: Future[Cursor[ItemData]] = collection.map {
+//      // find all people with name `name`
+//      _.find(Json.obj("name" -> name)).
+//        // sort them by creation date
+////        sort(Json.obj("created" -> -1)).
+//        // perform the query and get a cursor of JsObject
+//        cursor[ItemData]
+//    }
+//
+//    // gather all the JsObjects in a list
+//    val futureUsersList: Future[List[ItemData]] = cursor.flatMap(_.collect[List]())
+//
+//    // everything's ok! Let's reply with the array
+//    futureUsersList.map { items =>
+//      Ok(items.toString)
+//    }
+//  }
 
   def listItems: Action[AnyContent] = Action { implicit request =>
+//  def listItems: Action[AnyContent] = Action.async { implicit request =>
+
+//    println("collection " + collection.collect()
+
+//    def collection: JSONCollection = db.collection[JSONCollection]("items")
+
+//    val cursor: Cursor[ItemData] = collectionB.find("name" -> "asd").cursor[ItemData]
+//
+//
+//    val futureItemsList: Future[List[ItemData]] = cursor.collect[List]()
+//    futureItemsList.map(items => Ok(views.html.items(items, ItemData.createItemForm)))
+
+
     Ok(views.html.items(ItemData.items, ItemData.createItemForm))
   }
 
@@ -55,26 +85,14 @@ class ItemManagementController @Inject()(val messagesApi: MessagesApi, environme
         itemData.picture = Some(routes.Assets.at(s"images/$filename").url)
 
         val selector = BSONDocument("index" -> itemData.index.getOrElse(0))
+//        val selector = BSONDocument("index" -> 0)
         val futureResult = postAction match {
-          case "save" if itemData.index.get != -1 => collection.flatMap(_.update(selector ,itemData))
+          case "save" if itemData.index.get != -1 => collection.map(_.findAndUpdate(selector ,itemData))
           case "delete" if itemData.index.get != -1 => collection.flatMap(_.remove(itemData))
           case _ => collection.flatMap(_.insert(itemData))
         }
         futureResult.map(_ => Redirect(routes.ItemManagementController.listItems))
 
-//        if(itemData.index.get != -1 && postAction == "save") {
-//          ItemData.items.update(itemData.index.get, itemData)
-//          val futureResult = collection.flatMap(_.update(itemData.index, itemData))
-//          futureResult.map(_ => Redirect(routes.ItemManagementController.listItems))
-//        } else if (itemData.index.get != -1 && postAction == "delete") {
-//          val futureResult = collection.flatMap(_.remove(itemData.index))
-//          futureResult.map(_ => Redirect(routes.ItemManagementController.listItems))
-//          ItemData.items.remove(itemData.index.get)
-//        } else {
-//          val futureResult = collection.flatMap(_.insert(itemData))
-//          futureResult.map(_ => Redirect(routes.ItemManagementController.listItems))
-//          ItemData.items.append(itemData)
-//        }
       }.getOrElse {
         Redirect(routes.Application.index).flashing(
           "error" -> "Missing file")
