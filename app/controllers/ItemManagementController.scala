@@ -9,11 +9,16 @@ import models._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.play.json._
 import collection._
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.Files
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import reactivemongo.api.Cursor
 import reactivemongo.bson.BSONDocument
+
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+import scala.util.{Failure, Success}
 
 class ItemManagementController @Inject()(val messagesApi: MessagesApi, environment: play.api.Environment, val reactiveMongoApi: ReactiveMongoApi) extends Controller
   with I18nSupport with MongoController with ReactiveMongoComponents {
@@ -21,37 +26,39 @@ class ItemManagementController @Inject()(val messagesApi: MessagesApi, environme
   def collection: Future[JSONCollection] = database.map(_.collection[JSONCollection]("items"))
 
   def findByIndex(index: Int) = Action.async { implicit request =>
+
+    val futures = for {
+      all <- getResults(Json.obj())
+      one <- getResults(Json.obj("index" -> index))
+    } yield (all, one)
+
+    futures.map {
+      case (all, one) => Ok(views.html.items(all, ItemData.createItemForm.fill(one.head)))
+    }
+  }
+
+  private def getResults(selector: JsObject): Future[List[ItemData]] = {
     val cursor: Future[Cursor[ItemData]] = collection.map {
-      _.find(Json.obj("index" -> index)).
+      _.find(selector).
         cursor[ItemData]
     }
-
-    // gather all the JsObjects in a list
-    val futureUsersList: Future[List[ItemData]] = cursor.flatMap(_.collect[List]())
-
-    futureUsersList.map { items =>
-      Ok(views.html.items(ItemData.items, ItemData.createItemForm.fill(items.head)))
-    }
+    cursor.flatMap(_.collect[List]())
   }
 
   def listItems: Action[AnyContent] = Action.async { implicit request =>
 
-    val cursor: Future[Cursor[ItemData]] = collection.map {
-      _.find(Json.obj()).
-        cursor[ItemData]
-    }
-    val futureUsersList: Future[List[ItemData]] = cursor.flatMap(_.collect[List]())
-
-    futureUsersList.map { items =>
+    getResults(Json.obj()).map { items =>
       Ok(views.html.items(items, ItemData.createItemForm))
     }
   }
 
-  def createItem: Action[MultipartFormData[Files.TemporaryFile]] = Action(parse.multipartFormData) { implicit request =>
+  def createItem: Action[MultipartFormData[Files.TemporaryFile]] = Action.async(parse.multipartFormData) { implicit request =>
     val postAction = request.body.asFormUrlEncoded.get("action").get(0)
     val boundForm = ItemData.createItemForm.bindFromRequest
     boundForm.fold({ formWithErrors =>
-      BadRequest(views.html.items(ItemData.items, formWithErrors))
+      getResults(Json.obj()).map { items =>
+        BadRequest(views.html.items(items, formWithErrors))
+      }
     }, { itemData =>
       request.body.file("picture").map { picture =>
         import java.io.File
@@ -75,7 +82,7 @@ class ItemManagementController @Inject()(val messagesApi: MessagesApi, environme
         Redirect(routes.Application.index).flashing(
           "error" -> "Missing file")
       }
-      Redirect(routes.ItemManagementController.listItems)
+      Future(Redirect(routes.ItemManagementController.listItems))
     })
   }
 

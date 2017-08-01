@@ -55,4 +55,6 @@ POST    /create-item                controllers.ItemManagementController.createI
 GET     /load                       controllers.ItemManagementController.findByIndex(index: Int)
 
 
+# STREAMING
+GET     /somePdf                    controllers.StreamController.servePdf
 

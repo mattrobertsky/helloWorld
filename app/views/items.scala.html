@@ -1,9 +1,9 @@
 @(items: Seq[ItemData], form: Form[ItemData])(implicit messages: Messages, flash: Flash)
 
-@display(item: ItemData, index: Int) = {
+@display(item: ItemData) = {
     @item.name <br/>
     @image(item)
-    <a href="@routes.ItemManagementController.findByIndex(index)">edit</a>
+    <a href="@routes.ItemManagementController.findByIndex(item.index.get)">edit</a>
 }
 
 @image(item: ItemData) = {
@@ -16,8 +16,8 @@
 
     <h1>@if(items.isEmpty) { No items } else { Items }</h1>
     <ul>
-        @for((item, index) <- items.zipWithIndex) {
-            <li>@display(item, index)</li>
+        @for(item <- items) {
+            <li>@display(item)</li>
         }
     </ul>
 
