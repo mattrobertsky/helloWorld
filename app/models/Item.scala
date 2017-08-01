@@ -3,14 +3,14 @@ package models
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json._
-import reactivemongo.bson.BSONObjectID
-
+import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONObjectID}
 import play.modules.reactivemongo.json._
 import play.modules.reactivemongo.json.collection._
 
 import scala.collection.mutable.ArrayBuffer
 
-case class ItemData(index: Option[Int],
+case class ItemData(id: BSONObjectID,
+                    index: Option[Int],
                     name: String,
                     description: String,
                     manufacturer: String,
@@ -23,6 +23,18 @@ case class ItemData(index: Option[Int],
 
 object ItemData {
 
+//  implicit object ItemDataReader extends BSONDocumentReader[ItemData] {
+//    override def read(doc: BSONDocument): ItemData = {
+//      val id = doc.getAs[BSONObjectID]("_id").get
+//      val index = doc.getAs[Int]("index").get
+//      val name = doc.getAs[String]("name").get
+//      val description = doc.getAs[String]("description").get
+//      val manufacturer = doc.getAs[String]("manfacturer").get
+//      val
+//    }
+//  }
+
+
   import play.api.libs.json.Json
 
 
@@ -33,6 +45,7 @@ object ItemData {
 
   val createItemForm: Form[ItemData] = Form(
     mapping(
+      "id" -> number,
       "index" -> optional(number),
       "name" -> nonEmptyText,
       "description" -> nonEmptyText,
