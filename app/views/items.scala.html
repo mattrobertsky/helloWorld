@@ -12,6 +12,15 @@
     }
 }
 
+@index = @{
+    if (items.size > 0) {
+        form.data.getOrElse("index", items.last.index.get +1)
+    } else {
+        0
+    }
+}
+
+
 @main("Items") {
 
     <h1>@if(items.isEmpty) { No items } else { Items }</h1>
@@ -24,7 +33,7 @@
     <hr/>
 
     @helper.form(action = routes.ItemManagementController.createItem(), 'enctype -> "multipart/form-data") {
-        <input type="hidden" name="index" value="@form.data.getOrElse("index", items.size)"/>
+        <input type="hidden" name="index" value="@index"/>
         @helper.inputText(form("name"))
         @helper.inputText(form("description"))
         @helper.inputText(form("manufacturer"))

@@ -39,7 +39,8 @@ class ItemManagementController @Inject()(val messagesApi: MessagesApi, environme
 
   private def getResults(selector: JsObject): Future[List[ItemData]] = {
     val cursor: Future[Cursor[ItemData]] = collection.map {
-      _.find(selector).
+      _.find(selector)
+        .sort(Json.obj("index" -> 1)).
         cursor[ItemData]
     }
     cursor.flatMap(_.collect[List]())
@@ -67,8 +68,6 @@ class ItemManagementController @Inject()(val messagesApi: MessagesApi, environme
         val path = s"$p/public/images/$filename"
         picture.ref.moveTo(new File(path))
         itemData.picture = Some(routes.Assets.at(s"images/$filename").url)
-
-        println("index is " + itemData.index)
 
         val selector = BSONDocument("index" -> itemData.index.getOrElse(0))
         val futureResult = postAction match {
