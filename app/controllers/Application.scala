@@ -15,8 +15,9 @@ class Application extends Controller {
   }
 
   def authenticated: Action[AnyContent] = AuthenticatedAction { request =>
-//    Redirect(routes.Application.hello(name)).withSession("name" -> name)
-    Ok("hello " + request.session.get("name").get + " you are authentic")
+    // if the name isn't on the session you get an unauth header but just in case this
+    // changes, and to make codacy happy we use a getOr..
+    Ok("hello " + request.session.get("name").getOrElse("Anon") + " you are authentic")
   }
 
   def somethingStatic(): Action[AnyContent] = Action {
