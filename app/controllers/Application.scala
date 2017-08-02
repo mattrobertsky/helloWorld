@@ -1,5 +1,6 @@
 package controllers
 
+import actions.AuthenticatedAction
 import play.api.mvc._
 
 class Application extends Controller {
@@ -8,8 +9,14 @@ class Application extends Controller {
     Ok(views.html.index("Hello World."))
   }
 
-  def hello(name: String): Action[AnyContent] = Action {
+  def hello(name: String): Action[AnyContent] = Action { request =>
     Ok("Hello " + name).withSession("name" -> name)
+//    Redirect(routes.Application.authenticate(name)).withSession("name" -> name)
+  }
+
+  def authenticated: Action[AnyContent] = AuthenticatedAction { request =>
+//    Redirect(routes.Application.hello(name)).withSession("name" -> name)
+    Ok("hello " + request.session.get("name").get + " you are authentic")
   }
 
   def somethingStatic(): Action[AnyContent] = Action {
