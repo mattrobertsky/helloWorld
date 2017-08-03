@@ -15,10 +15,14 @@ import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class ItemManagementController @Inject()(val messagesApi: MessagesApi, environment: play.api.Environment, val reactiveMongoApi: ReactiveMongoApi) extends Controller
   with I18nSupport with MongoController with ReactiveMongoComponents {
+
+
 
   def collection: Future[JSONCollection] = database.map(_.collection[JSONCollection]("items"))
 

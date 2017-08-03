@@ -15,7 +15,7 @@ GET     /google                     controllers.Default.redirect(to = "http://ww
 GET     /hello/:name                controllers.Application.hello(name: String)
 
 # authenticate
-GET     /authenticated              controllers.Application.authenticated
+GET     /authenticated              controllers.CompositionController.authenticated
 
 
 # task two, static

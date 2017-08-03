@@ -1,6 +1,6 @@
 package controllers
 
-import actions.AuthenticatedAction
+import actions.LoggingAuthenticatedAction
 import play.api.mvc._
 
 class Application extends Controller {
@@ -14,11 +14,6 @@ class Application extends Controller {
 //    Redirect(routes.Application.authenticate(name)).withSession("name" -> name)
   }
 
-  def authenticated: Action[AnyContent] = AuthenticatedAction { request =>
-    // if the name isn't on the session you get an unauth header but just in case this
-    // changes, and to make codacy happy we use a getOr..
-    Ok("hello " + request.session.get("name").getOrElse("Anon") + " you are authentic")
-  }
 
   def somethingStatic(): Action[AnyContent] = Action {
     Ok(views.html.static("something static"))

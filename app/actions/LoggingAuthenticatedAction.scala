@@ -2,7 +2,7 @@ package actions
 
 import play.api.mvc.ActionBuilder
 
-class LoggingAuthenticatedAction {
+object LoggingAuthenticatedAction {
 
   val instance: ActionBuilder[AuthenticatedRequest] = LoggingAction andThen AuthenticatedAction
 
