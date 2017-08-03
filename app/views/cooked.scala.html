@@ -1,0 +1,13 @@
+@(title: String)(cookie: Option[Cookie])
+
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+    </head>
+    <body>
+        <h1>Cookie: @cookie.map(o => o.value).getOrElse("not set")</h1>
+    </body>
+</html>

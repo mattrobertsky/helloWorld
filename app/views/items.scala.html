@@ -1,0 +1,50 @@
+@(items: Seq[ItemData], form: Form[ItemData])(implicit messages: Messages, flash: Flash)
+
+@display(item: ItemData) = {
+    @item.name <br/>
+    @image(item)
+    <a href="@routes.ItemManagementController.findByIndex(item.index.get)">edit</a>
+}
+
+@image(item: ItemData) = {
+    @if(item.picture.nonEmpty && item.picture.get.replaceFirst("/assets/images/","").nonEmpty) {
+        <img style="width: 20vw" src="@item.picture")><br/>
+    }
+}
+
+@index = @{
+    if (items.size > 0) {
+        form.data.getOrElse("index", items.last.index.get +1)
+    } else {
+        0
+    }
+}
+
+
+@main("Items") {
+
+    <h1>@if(items.isEmpty) { No items } else { Items }</h1>
+    <ul>
+        @for(item <- items) {
+            <li>@display(item)</li>
+        }
+    </ul>
+
+    <hr/>
+
+    @helper.form(action = routes.ItemManagementController.createItem(), 'enctype -> "multipart/form-data") {
+        <input type="hidden" name="index" value="@index"/>
+        @helper.inputText(form("name"))
+        @helper.inputText(form("description"))
+        @helper.inputText(form("manufacturer"))
+        @helper.inputText(form("warranty"))
+        @helper.inputText(form("price"))
+        @helper.inputText(form("discount.howManyItems"))
+        @helper.inputText(form("discount.percentageOff"))
+        @helper.inputText(form("seller"))
+        @helper.inputFile(form("picture"))
+        <button type="submit" name="action" value="save">save</button>
+        <button type="submit" name="action" value="delete">delete</button>
+    }
+
+}
